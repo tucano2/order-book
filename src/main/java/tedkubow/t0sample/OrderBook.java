@@ -43,7 +43,7 @@ public class OrderBook {
 				if (remainingShares < 0) {//order partially filled, all liquidity taken at current level
 					targetBook.pollFirstEntry();
 					sweepBook(limitPrice, Math.abs(remainingShares), isBuying);
-					logTrade(isBuying, quantity - remainingShares, topOfBookPrice);
+					logTrade(isBuying, quantity + remainingShares, topOfBookPrice);
 				}
 
 				if (remainingShares == 0) {//order fully filled, all liquidity taken at current level
