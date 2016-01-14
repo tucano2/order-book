@@ -31,11 +31,11 @@ public class OrderBook {
 
 		Entry<Double, AtomicInteger> topOfBook = book.firstEntry();
 
-		if (topOfBook != null) {//book is empty
+		if (topOfBook != null) {//check book is empty
 			Double topOfBookPrice = topOfBook.getKey();
 			AtomicInteger topOfBookQuantity = topOfBook.getValue();
 
-			if ((isBuying && topOfBookPrice <= limitPrice) || (!isBuying && topOfBookPrice >= limitPrice)) {//order is not marketable
+			if ((isBuying && topOfBookPrice <= limitPrice) || (!isBuying && topOfBookPrice >= limitPrice)) {//check order is not marketable
 
 				int remainingShares = topOfBookQuantity.addAndGet(quantity * -1);
 
@@ -48,8 +48,8 @@ public class OrderBook {
 					book.pollFirstEntry();
 				}
 
-				if (remainingShares > 0) {//order not fully filled
-					addOrderToBook(limitPrice, remainingShares, isBuying ? bids : offers);
+				if (remainingShares > 0) {//order fully filled, still liquidity at level
+					System.out.println((isBuying?"Bought " : "Sold ") + quantity + " at " + topOfBookPrice);
 				}
 			} else {
 				addOrderToBook(limitPrice, quantity, isBuying ? bids : offers);
@@ -61,7 +61,7 @@ public class OrderBook {
 
 	private void addOrderToBook(double limitPrice, int quantity, TreeMap<Double, AtomicInteger> book) {
 		AtomicInteger existingQuantity = book.putIfAbsent(limitPrice, new AtomicInteger(quantity));
-		if (existingQuantity != null) {// price level exists, accumulate quantity
+		if (existingQuantity != null) {// price level already exists so accumulate quantity
 			existingQuantity.addAndGet(quantity);
 		}
 	}
@@ -70,19 +70,7 @@ public class OrderBook {
 		System.out.println("bids:" + bids);
 		System.out.println("offers:" + offers);
 	}
-
-	public double getBestPrice(TreeMap<Double, AtomicInteger> book) {
-		return book.firstEntry().getKey();
-	}
-
-	public double getBestBid() {
-		return getBestPrice(bids);
-	}
-
-	public double getBestOffer() {
-		return getBestPrice(offers);
-	}
-
+	
 	public static OrderBook getOrderBook() {
 		return theOrderBook;
 	}

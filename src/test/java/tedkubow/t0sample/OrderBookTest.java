@@ -6,13 +6,12 @@ public class OrderBookTest {
 
 	@Test
 	public void testBasicOrderBook() {
-		OrderBook orderBook = OrderBook.getOrderBook();
-		
-		orderBook.showBook();
+		OrderBook orderBook = OrderBook.getOrderBook();		
 
-		orderBook.buy(430, 10);
-		orderBook.buy(430, 15);
-		orderBook.buy(430.10, 85);
+
+		orderBook.buy(430, 5);
+		orderBook.buy(430, 5);
+		orderBook.buy(430.10, 10);
 
 		orderBook.showBook();
 		
@@ -21,6 +20,9 @@ public class OrderBookTest {
 		orderBook.sell(432.5, 8);
 		orderBook.sell(433, 3);
 
+		orderBook.showBook();
+		
+		orderBook.sell(420, 3);
 		orderBook.showBook();
 	}
 
