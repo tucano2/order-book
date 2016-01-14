@@ -20,59 +20,55 @@ public class OrderBook {
 	});
 
 	public void buy(double limitPrice, int quantity) {
-		sweepOffers(limitPrice, quantity);
-	}
-
-	public void sell(double limitPrice, int quantity) {
-		sweepBids(limitPrice, quantity);
-	}
-
-	private void sweepOffers(double limitPrice, int quantity) {
 		sweepBook(limitPrice, quantity, offers, true);
 	}
 
-	private void sweepBids(double limitPrice, int quantity) {
+	public void sell(double limitPrice, int quantity) {
 		sweepBook(limitPrice, quantity, bids, false);
 	}
 
 	private void sweepBook(double limitPrice, int quantity, TreeMap<Double, AtomicInteger> book, boolean isBuying) {
+
 		Entry<Double, AtomicInteger> topOfBook = book.firstEntry();
 
-		if (topOfBook != null) {
+		if (topOfBook != null) {//book is empty
 			Double topOfBookPrice = topOfBook.getKey();
 			AtomicInteger topOfBookQuantity = topOfBook.getValue();
 
-			if ((isBuying && topOfBookPrice <= limitPrice) || topOfBookPrice >= limitPrice) {
+			if ((isBuying && topOfBookPrice <= limitPrice) || (!isBuying && topOfBookPrice >= limitPrice)) {//order is not marketable
 
 				int remainingShares = topOfBookQuantity.addAndGet(quantity * -1);
 
-				if (remainingShares < 0) {
+				if (remainingShares < 0) {//order partially filled, all liquidity taken at current level
 					book.pollFirstEntry();
 					sweepBook(limitPrice, Math.abs(remainingShares), book, isBuying);
 				}
 
-				if (remainingShares == 0) {
+				if (remainingShares == 0) {//order fully filled, all liquidity taken at current level
 					book.pollFirstEntry();
 				}
 
-				if (remainingShares > 0) {
-					addOrderToBook(limitPrice, remainingShares, book);
+				if (remainingShares > 0) {//order not fully filled
+					addOrderToBook(limitPrice, remainingShares, isBuying ? bids : offers);
 				}
+			} else {
+				addOrderToBook(limitPrice, quantity, isBuying ? bids : offers);
 			}
 		} else {
-			addOrderToBook(limitPrice, quantity, book);
+			addOrderToBook(limitPrice, quantity, isBuying ? bids : offers);
 		}
 	}
 
 	private void addOrderToBook(double limitPrice, int quantity, TreeMap<Double, AtomicInteger> book) {
 		AtomicInteger existingQuantity = book.putIfAbsent(limitPrice, new AtomicInteger(quantity));
-		if (existingQuantity != null) {
-			existingQuantity.addAndGet(quantity);// accumulate quantity at level
+		if (existingQuantity != null) {// price level exists, accumulate quantity
+			existingQuantity.addAndGet(quantity);
 		}
 	}
 
 	public void showBook() {
-
+		System.out.println("bids:" + bids);
+		System.out.println("offers:" + offers);
 	}
 
 	public double getBestPrice(TreeMap<Double, AtomicInteger> book) {
@@ -93,9 +89,7 @@ public class OrderBook {
 
 	// singelton
 	private OrderBook() {
-		// seed books
-		bids.put(0D, new AtomicInteger(0));
-		offers.put(Double.MAX_VALUE, new AtomicInteger(0));
+
 	}
 
 }
