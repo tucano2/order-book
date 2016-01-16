@@ -43,10 +43,7 @@ public class OrderBook {
 			Double topOfBookPrice = topOfBook.getKey();
 			AtomicInteger topOfBookQuantity = topOfBook.getValue();
 
-			if ((isBuying && topOfBookPrice <= limitPrice) || (!isBuying && topOfBookPrice >= limitPrice)) {// check
-																											// order
-																											// is
-																											// marketable
+			if ((isBuying && topOfBookPrice <= limitPrice) || (!isBuying && topOfBookPrice >= limitPrice)) {// check order is marketable
 
 				int remainingShares = topOfBookQuantity.addAndGet(quantity * -1);
 
@@ -81,8 +78,7 @@ public class OrderBook {
 
 	private void addOrderToBook(double limitPrice, int quantity, NavigableMap<Double, AtomicInteger> book) {
 		AtomicInteger existingQuantity = book.putIfAbsent(limitPrice, new AtomicInteger(quantity));
-		if (existingQuantity != null) {// price level already exists so
-										// accumulate quantity
+		if (existingQuantity != null) {// price level already exists so accumulate quantity
 			existingQuantity.addAndGet(quantity);
 		}
 	}
