@@ -77,5 +77,5 @@ public class OrderBookRestWrapper {
 
 	}
 	
-	static class 
+	
 }
