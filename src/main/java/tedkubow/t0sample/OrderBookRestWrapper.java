@@ -1,9 +1,13 @@
 package tedkubow.t0sample;
 
 import static spark.Spark.get;
+import static spark.Spark.port;
+import static spark.Spark.post;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import com.google.gson.Gson;
 
 public class OrderBookRestWrapper {
 
@@ -12,7 +16,16 @@ public class OrderBookRestWrapper {
 	public OrderBookRestWrapper() {
 		orderBook = OrderBook.getOrderBook();
 
-		get("/hello", (req, res) -> "Hello World");
+		port(3000);
+		get("/book", (req, res) -> book());
+		post("/buy", (req, res) -> {
+			String body = req.body();
+			Gson gson = new Gson();
+			Payload payload = gson.fromJson(body, Payload.class);
+			orderBook.buy(payload.prc, payload.qty);
+			return "";
+		});
+		// post("/sell", (req, res) -> sell());
 	}
 
 	public void buy(double limitPrice, int quantity) {
@@ -35,4 +48,34 @@ public class OrderBookRestWrapper {
 		System.out.println("running...");
 
 	}
+
+	static class Payload {
+		Integer qty;
+		Double prc;
+
+		public Payload(Integer qty, Double prc) {
+			super();
+			this.qty = qty;
+			this.prc = prc;
+		}
+
+		public Integer getQty() {
+			return qty;
+		}
+
+		public void setQty(Integer qty) {
+			this.qty = qty;
+		}
+
+		public Double getPrc() {
+			return prc;
+		}
+
+		public void setPrc(Double prc) {
+			this.prc = prc;
+		}
+
+	}
+	
+	static class 
 }
