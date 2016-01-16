@@ -4,6 +4,9 @@ import static spark.Spark.get;
 import static spark.Spark.port;
 import static spark.Spark.post;
 
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.io.StringReader;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
@@ -12,6 +15,7 @@ import java.util.stream.Collectors;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.google.gson.stream.JsonReader;
 
 public class OrderBookRestWrapper {
 
@@ -24,15 +28,16 @@ public class OrderBookRestWrapper {
 		port(3000);
 		get("/book", (req, res) -> gson.toJson(book()));
 		post("/buy", "application/json", (req, res) -> {
-			String body = req.body().replace("'", "");
-			Gson gson = new Gson();
+			
+			String body = req.body();			
+			Gson gson = new Gson();		
 			QuantityAndPrice payload = gson.fromJson(body, QuantityAndPrice.class);
 			orderBook.buy(payload.prc, payload.qty);
 			return "";
 		});
-		post("/sell", "application/json", (req, res) -> {
-			String body = req.body().replace("'", "");
-			Gson gson = new Gson();
+		post("/sell", "application/json", (req, res) -> {			
+			String body = req.body();
+			Gson gson = new Gson();			
 			QuantityAndPrice payload = gson.fromJson(body, QuantityAndPrice.class);
 			orderBook.sell(payload.prc, payload.qty);
 			return "";
