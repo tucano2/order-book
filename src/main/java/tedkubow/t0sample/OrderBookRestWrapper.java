@@ -6,12 +6,14 @@ import static spark.Spark.post;
 
 import java.util.List;
 import java.util.Map;
-import java.util.TreeMap;
+import java.util.NavigableMap;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+
+import tedkubow.t0sample.OrderBookRestWrapper.QuantityAndPrice;
 
 public class OrderBookRestWrapper {
 
@@ -50,7 +52,7 @@ public class OrderBookRestWrapper {
 
 	public Results book() {
 
-		Map<String, TreeMap<Double, AtomicInteger>> internalBook = orderBook.showBook();
+		Map<String, NavigableMap<Double, AtomicInteger>> internalBook = orderBook.showBook();
 
 		// convert Map.Entry to QuantityAndPrice so GSON will serialize with
 		// desired field names
